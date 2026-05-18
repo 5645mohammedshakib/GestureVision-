@@ -1,0 +1,6 @@
+__pycache__/
+models/
+recordings/
+screenshots/
+*.task
+*.caffemodel
