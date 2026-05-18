@@ -14,7 +14,7 @@ A next-generation AI-powered computer control, advanced computer vision, and sur
 ### 🕶️ Advanced Vision Modes (Sci-Fi Filters)
 - **Hacker Mode (`H`):** Matrix-style falling digital green code rain.
 - **Thermal Scanner (`T`):** Simulated jet-colormap thermal signature vision.
-- **Night Vision (`N`):** Phosphor green military night tracking with active crosshairs.
+- **Night Vision (`N`):** Phosphor green military night vision mask with active crosshairs.
 - **Red Alert (`E`):** Emergency edge-pulsing warning for "system lockdown" simulation.
 
 ### 📊 God-Mode Holographic HUD
@@ -64,6 +64,13 @@ python main.py
 - `E` - Toggle Emergency Red Alert
 - `G` - Toggle Gesture Guide
 - `Esc` - Exit Application
+
+---
+
+## 🔒 Security & Privacy
+- **Local Processing:** All computer vision processing is done locally on your machine. No video or images are sent to any external server.
+- **No Data Logging:** The app does not save any personal data or video logs unless explicitly triggered by the user (e.g., screenshots or recordings).
+- **Safe Controls:** Air Mouse controls are designed to be intuitive and can be disabled instantly by pressing `A` or exiting with `Esc`.
 
 ---
 > [!NOTE]
