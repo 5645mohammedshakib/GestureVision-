@@ -73,5 +73,13 @@ python main.py
 - **Safe Controls:** Air Mouse controls are designed to be intuitive and can be disabled instantly by pressing `A` or exiting with `Esc`.
 
 ---
+
+## 🚀 Future Roadmap (Ache Ideas)
+- **🎙️ Voice Integration:** Combine hand gestures with voice commands for a true JARVIS experience.
+- **🧠 Custom Gesture Training:** Feature to let users record and train their own custom gestures.
+- **🌐 Web Control:** A browser extension to scroll and click web pages using air gestures.
+- **🎮 Gaming Mode:** Map gestures to keyboard keys for playing games without a controller.
+
+---
 > [!NOTE]
 > This project is for educational and entertainment purposes. Air Mouse mode requires camera access and proper lighting for best results.
