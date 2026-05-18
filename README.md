@@ -1,1 +1,70 @@
-# GestureVision-
+# GestureVision X - GODMODE 🚀
+
+A next-generation AI-powered computer control, advanced computer vision, and surveillance operating system inspired by JARVIS, Cyberpunk 2077, and holographic HUDs.
+
+---
+
+## 🌟 Key Features
+
+### 🎮 Futuristic Interaction
+- **Air Mouse Mode:** Control your desktop mouse cursor using your index finger. Pinch to click.
+- **Air Writing Canvas:** Draw or write in the air using gestures. Clear with a fist.
+- **Neural Gesture Control:** Real-time hand tracking and gesture smoothing powered by MediaPipe.
+
+### 🕶️ Advanced Vision Modes (Sci-Fi Filters)
+- **Hacker Mode (`H`):** Matrix-style falling digital green code rain.
+- **Thermal Scanner (`T`):** Simulated jet-colormap thermal signature vision.
+- **Night Vision (`N`):** Phosphor green military night tracking with active crosshairs.
+- **Red Alert (`E`):** Emergency edge-pulsing warning for "system lockdown" simulation.
+
+### 📊 God-Mode Holographic HUD
+- High-DPI razor-sharp window initialization.
+- Real-time FPS counter and session statistics.
+- Dynamic neon particle trails from fingertips.
+- Sci-Fi glass panels and ARIA Assistant overlay.
+
+---
+
+## 🛠️ Technology Stack
+- **Python 3.14+**
+- **OpenCV:** High-performance computer vision and rendering.
+- **MediaPipe:** Hand landmarker and tracking.
+- **PyAutoGUI:** OS-level mouse control.
+
+---
+
+## 📦 Setup & Installation
+
+1. **Clone the Repository:**
+   ```bash
+   git clone https://github.com/5645mohammedshakib/GestureVision-
+   cd GestureVision-
+   ```
+
+2. **Install Required Libraries:**
+   ```bash
+   pip install opencv-python mediapipe pyautogui numpy
+   ```
+
+3. **Required Models:**
+   - Ensure `hand_landmarker.task` is placed inside the `models/` folder.
+
+---
+
+## 🖥️ How to Run
+```bash
+python main.py
+```
+
+## ⌨️ Master Controls
+- `A` - Toggle Air Mouse
+- `H` - Toggle Hacker Mode
+- `T` - Toggle Thermal Vision
+- `N` - Toggle Night Vision
+- `E` - Toggle Emergency Red Alert
+- `G` - Toggle Gesture Guide
+- `Esc` - Exit Application
+
+---
+> [!NOTE]
+> This project is for educational and entertainment purposes. Air Mouse mode requires camera access and proper lighting for best results.
