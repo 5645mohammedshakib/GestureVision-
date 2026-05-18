@@ -489,7 +489,8 @@ def main():
 
         # 🎛️ Dynamic Special Modes Overlays
         if hacker_mode:
-            matrix.draw(out)
+            # matrix.draw(out) # Disabled to clean the screen as requested
+            pass
             
         if thermal_mode:
             # Sleek jet-colored dynamic thermal signature simulation
