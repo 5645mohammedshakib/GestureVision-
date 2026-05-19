@@ -66,8 +66,8 @@ WINDOW_NAME       = "GestureVision X GODMODE"
 FONT              = cv2.FONT_HERSHEY_SIMPLEX
 MODEL_PATH        = os.path.join(os.path.dirname(os.path.abspath(__file__)), "models", "hand_landmarker.task")
 CAMERA_INDEX      = 0
-# Internal processing speed resolution (1280x720 for native high-definition)
-PROC_W, PROC_H    = 1280, 720
+# Internal processing speed resolution (640x360 for high performance)
+PROC_W, PROC_H    = 640, 360
 # Beautiful HUD presentation resolution (1280x720 for flawless UI)
 FRAME_W, FRAME_H  = 1280, 720
 DET_CONF          = 0.45

@@ -48,12 +48,12 @@ def get_finger_states(lm, handedness="RIGHT HAND"):
     # Thumb: Check if the thumb tip is further from the pinky base than the thumb IP joint.
     thumb = _dist(lm[4], lm[17]) > _dist(lm[3], lm[17])
 
-    # Four fingers: check distance from tip to MCP vs PIP to MCP (rotation invariant!)
+    # Four fingers: combine wrist-distance check (rotation invariant) and vertical check (stable fallback)
     fingers = [thumb]
-    for tip, pip, mcp in [(8, 6, 5), (12, 10, 9), (16, 14, 13), (20, 18, 17)]:
-        d_tip = _dist(lm[tip], lm[mcp])
-        d_pip = _dist(lm[pip], lm[mcp])
-        fingers.append(d_tip > d_pip * 1.1)
+    for tip, pip in [(8, 6), (12, 10), (16, 14), (20, 18)]:
+        dist_ok = _dist(lm[tip], lm[0]) > _dist(lm[pip], lm[0]) * 1.05
+        vert_ok = lm[tip].y < lm[pip].y
+        fingers.append(dist_ok or vert_ok)
     return fingers   # [Thumb, Index, Middle, Ring, Pinky]
 
 
@@ -88,7 +88,7 @@ def detect_gesture(lm, handedness="RIGHT HAND"):
         return "open_palm"
 
     # ── 2. Fist: all down or hand closed ──────────────────────────────────
-    if not any(fingers) or (hand_openness(lm) < 0.18 and not index and not middle):
+    if not any(fingers) or (hand_openness(lm) < 0.13 and not index and not middle):
         return "fist"
 
     # ── 3. Peace / V-sign: index + middle, rest down ─────────────────────
