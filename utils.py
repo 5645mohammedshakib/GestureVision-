@@ -262,7 +262,7 @@ class WritingCanvas:
 # ─────────────────────────────────────────────────────────────
 # Skeleton with Glow
 # ─────────────────────────────────────────────────────────────
-def draw_skeleton(frame, landmarks, stability=1.0, hand_label="RIGHT HAND"):
+def draw_skeleton(frame, landmarks, stability=1.0, hand_label="RIGHT HAND", show_telemetry=False):
     from gestures import HAND_CONNECTIONS
     H,W=frame.shape[:2]
     br=int(140+stability*115)
@@ -298,7 +298,7 @@ def draw_skeleton(frame, landmarks, stability=1.0, hand_label="RIGHT HAND"):
         cv2.circle(frame,(cx,cy),r,jcol,-1,cv2.LINE_AA)
 
     # Holographic Floating Biometric Telemetry
-    if len(landmarks) > 20:
+    if show_telemetry and len(landmarks) > 20:
         # Index Tip node 8
         lm8 = landmarks[8]
         cx8, cy8 = int(lm8.x * W), int(lm8.y * H)

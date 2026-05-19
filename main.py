@@ -541,7 +541,7 @@ def main():
             for idx, hand_lms in enumerate(result.hand_landmarks):
                 hand_raw = result.handedness[idx][0].category_name
                 hand_lbl = "RIGHT HAND" if hand_raw == "Left" else "LEFT HAND"
-                draw_skeleton(out, hand_lms, stability, hand_lbl)
+                draw_skeleton(out, hand_lms, stability, hand_lbl, show_telemetry=show_tracker)
 
         if landmarks:
             # Emit neon particles from index tip (8)

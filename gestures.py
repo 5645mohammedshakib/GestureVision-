@@ -46,13 +46,14 @@ def get_finger_states(lm, handedness="RIGHT HAND"):
         handedness: string indicating "RIGHT HAND" or "LEFT HAND"
     """
     # Thumb: Check if the thumb tip is further from the pinky base than the thumb IP joint.
-    # This distance check works perfectly regardless of left/right hand, mirroring, or palm/back facing.
     thumb = _dist(lm[4], lm[17]) > _dist(lm[3], lm[17])
 
-    # Four fingers: tip y < pip y  →  finger points upward
+    # Four fingers: check distance from tip to MCP vs PIP to MCP (rotation invariant!)
     fingers = [thumb]
-    for tip, pip in [(8,6), (12,10), (16,14), (20,18)]:
-        fingers.append(lm[tip].y < lm[pip].y)
+    for tip, pip, mcp in [(8, 6, 5), (12, 10, 9), (16, 14, 13), (20, 18, 17)]:
+        d_tip = _dist(lm[tip], lm[mcp])
+        d_pip = _dist(lm[pip], lm[mcp])
+        fingers.append(d_tip > d_pip * 1.1)
     return fingers   # [Thumb, Index, Middle, Ring, Pinky]
 
 
