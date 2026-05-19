@@ -194,7 +194,7 @@ ARIA_TIPS = {
 
 ARIA_GREETINGS = [
     "Welcome. I am ARIA, your tactical gesture neural operating system.",
-    "ARIA Core v3.2 online. Neural interface linked. Present gestures to control.",
+    "ARIA Core online. Neural interface linked. Present gestures to control.",
     "Futuristic operating system online. Systems operational. Awaiting your spatial command.",
     "Telemetry synchronised. ARIA interactive core fully initialized. Standing by.",
 ]
@@ -259,6 +259,15 @@ class ARIAAssistant:
         self.intent_forecast = "AWAITING TELEMETRY"
         self.compute_load    = 12.4
         
+        # Audio Waveform & Voice Subtitles Subsystem
+        self.subtitle_text = ""
+        self.subtitle_t = 0.0
+        
+        # Macro Command Combo Tracker
+        self.combo_history = []
+        self.active_combo_msg = ""
+        self.last_combo_t = 0.0
+
         # Challenge system
         self.challenge_active = False
         self.challenge_gesture = ""
@@ -268,7 +277,13 @@ class ARIAAssistant:
         self.next_challenge_t = time.time() + 15.0 # first challenge in 15 seconds
 
         # Greeted?
-        _speak_async(random.choice(ARIA_GREETINGS))
+        self.speak(random.choice(ARIA_GREETINGS))
+
+    def speak(self, text):
+        """Simulate real-time voice synthesis and output subtitles on screen."""
+        self.subtitle_text = text
+        self.subtitle_t = time.time()
+        self.thought_stream.append(f"Vocal Matrix: {text[:28]}...")
 
     # ── Public API ─────────────────────────────────────────────
     def update(self, gesture, stability):
@@ -302,6 +317,29 @@ class ARIAAssistant:
         else:
             self.intent_forecast = "AWAITING COMMAND"
 
+        # Combo Analyzer logic
+        if gesture != "unknown" and gesture != self.last_gesture and stability >= 0.85:
+            self.combo_history.append(gesture)
+            if len(self.combo_history) > 3:
+                self.combo_history.pop(0)
+            
+            # Check for combos
+            if self.combo_history == ["open_palm", "peace", "thumbs_up"]:
+                self.active_combo_msg = "FILTER SEQUENCE MATCHED"
+                self.last_combo_t = now
+                self.speak("Spectrum shift overload authorized.")
+                self.thought_stream.append("COMBO: Palm -> Peace -> Thumbs Up")
+            elif self.combo_history == ["one_finger", "ok", "peace"]:
+                self.active_combo_msg = "PRECISION CALIBRATION"
+                self.last_combo_t = now
+                self.speak("Precision calibration sequence initialized.")
+                self.thought_stream.append("COMBO: 1F -> OK -> Peace")
+            elif self.combo_history == ["spiderman", "rock", "fist"]:
+                self.active_combo_msg = "SHIELD SYSTEM ENGAGED"
+                self.last_combo_t = now
+                self.speak("Holographic shield active.")
+                self.thought_stream.append("COMBO: Spider -> Rock -> Fist")
+
         # Challenge minigame engine (only in normal mode)
         if self.mode == self.MODE_NORMAL:
             self._update_challenge(gesture, stability, now)
@@ -322,16 +360,13 @@ class ARIAAssistant:
         step = TUTORIAL_STEPS[0]
         self.message     = f"TUTORIAL: {step['name']}"
         self.sub_message = step['instruction']
-        _speak_async(f"Tutorial started. Step 1. {step['voice']}")
+        self.speak(f"Tutorial started. Step 1. {step['voice']}")
 
     def stop_tutorial(self):
         self.mode        = self.MODE_NORMAL
         self.message     = f"Tutorial complete! Score: {self._score}/{len(TUTORIAL_STEPS)}"
         self.sub_message = "Great work! You learned all gestures."
-        _speak_async(f"Tutorial complete! You scored {self._score} out of {len(TUTORIAL_STEPS)}!")
-
-    def speak(self, text):
-        _speak_async(text)
+        self.speak(f"Tutorial complete! You scored {self._score} out of {len(TUTORIAL_STEPS)}!")
 
     @property
     def tutorial_active(self):
@@ -390,7 +425,7 @@ class ARIAAssistant:
             self.last_gesture = gesture
             self.thought_stream.append(f"Gesture shift -> {gesture}")
             if random.random() < 0.4:
-                _speak_async(self.sub_message)
+                self.speak(self.sub_message)
 
         elif gesture == "unknown" and (now - self.last_tip_t) > self.tip_interval:
             self.message     = "ARIA TIP"
@@ -408,19 +443,19 @@ class ARIAAssistant:
         if gesture == target and stability >= 0.85:
             if self.tut_hold_t is None:
                 self.tut_hold_t = now
-                _speak_async("Hold it steady!")
+                self.speak("Hold it steady!")
             elif (now - self.tut_hold_t) >= self.tut_hold_req:
                 # Gesture held long enough — PASS
                 self.tut_completed.add(target)
                 self._score += 1
-                _speak_async(random.choice(ARIA_ENCOURAGE))
+                self.speak(random.choice(ARIA_ENCOURAGE))
                 self.tut_step    += 1
                 self.tut_hold_t   = None
                 if self.tut_step < len(TUTORIAL_STEPS):
                     nxt = TUTORIAL_STEPS[self.tut_step]
                     self.message     = f"Step {self.tut_step+1}/{len(TUTORIAL_STEPS)}: {nxt['name']}"
                     self.sub_message = nxt['instruction']
-                    _speak_async(nxt['voice'])
+                    self.speak(nxt['voice'])
                 else:
                     self.stop_tutorial()
         else:
@@ -431,10 +466,14 @@ class ARIAAssistant:
 
     # ── Rendering ────────────────────────────────────────────────
     def draw(self, frame, state=None):
-        """Renders the ARIA panel on the frame."""
+        """Renders the ARIA panel and floating elements on the frame."""
         H, W = frame.shape[:2]
         now   = time.time()
         pulse = abs(np.sin((now - self._pulse_t) * 2.0))   # 0→1 oscillation
+
+        # Render floating subtitles
+        if self.subtitle_text and (now - self.subtitle_t) < 4.0:
+            self._draw_subtitles(frame, W, H, now)
 
         if self.mode == self.MODE_TUTORIAL:
             self._draw_tutorial_overlay(frame, W, H, pulse)
@@ -472,6 +511,23 @@ class ARIAAssistant:
             color = (0, 255, 230) # Cyan Normal
         cv2.circle(frame, (cx, cy), r_core, color, -1, cv2.LINE_AA)
 
+    def _draw_subtitles(self, frame, W, H, now):
+        """Beautiful glowing glass subtitle panel overlay."""
+        from utils import glass_panel
+        px = 30
+        panel_w = min(W - 390, 860)
+        sy = H - 142
+        
+        # Draw background glass subtitle box
+        glass_panel(frame, px, sy, px+panel_w, sy+32, (15, 6, 22), 0.82, (0, 255, 230), r=8)
+        
+        # Calculate type-writer text progression
+        chars_visible = int((now - self.subtitle_t) * 45) # 45 characters per second
+        display_text = self.subtitle_text[:chars_visible]
+        
+        # Draw text
+        cv2.putText(frame, f"[ARIA VOICE]: \"{display_text}\"", (px+18, sy+20), FONT, 0.36, (240, 255, 255), 1, cv2.LINE_AA)
+
     def _draw_tip_panel(self, frame, W, H, pulse):
         """ARIA tip banner — bottom-centre."""
         from utils import glass_panel, txt, label
@@ -488,13 +544,21 @@ class ARIAAssistant:
         self._draw_persona_core(frame, px+30, py+32, pulse)
         cv2.putText(frame, f"[{self.cognitive_state}]", (px+8, py+68), FONTB, 0.28, border_col, 1, cv2.LINE_AA)
 
-        # Dialog messages
-        cv2.putText(frame, "ARIA", (px+58, py+20), FONTB, 0.44, (0,230,255), 1, cv2.LINE_AA)
-        cv2.putText(frame, self.message[:70], (px+58, py+40), FONTB, 0.42, (240,240,240), 1, cv2.LINE_AA)
-        cv2.putText(frame, self.sub_message[:80], (px+58, py+58), FONT, 0.35, (120,220,150), 1, cv2.LINE_AA)
+        # Bouncing voice waves (Visual audio activity)
+        for j in range(6):
+            speed_mult = 18.0 if self.cognitive_state == "DECODING" else 8.0 if self.cognitive_state == "STABILIZING" else 5.0
+            amp = int(4 + 14 * abs(np.cos(time.time() * speed_mult + j * 0.8)))
+            wx = px + 58 + j * 5
+            wy = py + 32
+            cv2.line(frame, (wx, wy - amp//2), (wx, wy + amp//2), (0, 255, 230), 1, cv2.LINE_AA)
+
+        # Dialog messages (Shifted right to make room for waveform)
+        cv2.putText(frame, "ARIA", (px+96, py+20), FONTB, 0.44, (0,230,255), 1, cv2.LINE_AA)
+        cv2.putText(frame, self.message[:65], (px+96, py+40), FONTB, 0.42, (240,240,240), 1, cv2.LINE_AA)
+        cv2.putText(frame, self.sub_message[:75], (px+96, py+58), FONT, 0.35, (120,220,150), 1, cv2.LINE_AA)
 
         # Helper controls info row
-        cv2.putText(frame, "T = Toggle Tutorial | G = Toggle Gesture Guide", (px+58, py+74), FONT, 0.30, (120,120,140), 1, cv2.LINE_AA)
+        cv2.putText(frame, "T = Toggle Tutorial | G = Toggle Gesture Guide", (px+96, py+74), FONT, 0.30, (120,120,140), 1, cv2.LINE_AA)
 
         # Right Telemetry and Thought Log Block
         tx = px + panel_w - 300
@@ -506,7 +570,11 @@ class ARIAAssistant:
         if len(self.thought_stream) >= 2:
             cv2.putText(frame, f">> {self.thought_stream[-2][:38]}", (tx, py+44), FONT, 0.28, (120, 220, 150), 1, cv2.LINE_AA)
             cv2.putText(frame, f">> {self.thought_stream[-1][:38]}", (tx, py+56), FONT, 0.28, (120, 220, 150), 1, cv2.LINE_AA)
-            if self.challenge_active:
+            
+            # Draw combo notification if active
+            if (time.time() - self.last_combo_t) < 3.0:
+                cv2.putText(frame, self.active_combo_msg, (tx, py+68), FONTB, 0.28, (240, 50, 250), 1, cv2.LINE_AA)
+            elif self.challenge_active:
                 cv2.putText(frame, "CHALLENGE ACTIVE", (tx, py+68), FONTB, 0.28, (0,165,255), 1, cv2.LINE_AA)
             else:
                 cv2.putText(frame, f"STREAK: {self.challenge_streak}", (tx, py+68), FONT, 0.28, (0,255,180), 1, cv2.LINE_AA)

@@ -262,6 +262,31 @@ def draw_skeleton(frame, landmarks, stability=1.0):
         cv2.circle(frame,(cx,cy),r+2,(0,30,15),-1)
         cv2.circle(frame,(cx,cy),r,jcol,-1,cv2.LINE_AA)
 
+    # Holographic Floating Biometric Telemetry
+    if len(landmarks) > 20:
+        # Index Tip node 8
+        lm8 = landmarks[8]
+        cx8, cy8 = int(lm8.x * W), int(lm8.y * H)
+        tx8, ty8 = cx8 - 110, cy8 - 45
+        cv2.line(frame, (cx8, cy8), (tx8 + 70, ty8 + 10), (0, br, int(br*0.8)), 1, cv2.LINE_AA)
+        cv2.circle(frame, (cx8, cy8), 4, (0, br, 255), 1, cv2.LINE_AA)
+        # Background box for details
+        cv2.rectangle(frame, (tx8, ty8 - 10), (tx8 + 135, ty8 + 16), (10, 8, 16), -1)
+        cv2.rectangle(frame, (tx8, ty8 - 10), (tx8 + 135, ty8 + 16), (0, br, int(br*0.6)), 1, cv2.LINE_AA)
+        cv2.putText(frame, "NODE_08 [INDEX]", (tx8 + 6, ty8 + 1), FONT, 0.28, (0, br, 255), 1, cv2.LINE_AA)
+        cv2.putText(frame, f"X:{lm8.x:.2f} Y:{lm8.y:.2f} Z:{lm8.z:.2f}", (tx8 + 6, ty8 + 11), FONT, 0.26, (200, 200, 200), 1, cv2.LINE_AA)
+
+        # Pinky Tip node 20
+        lm20 = landmarks[20]
+        cx20, cy20 = int(lm20.x * W), int(lm20.y * H)
+        tx20, ty20 = cx20 + 40, cy20 - 45
+        cv2.line(frame, (cx20, cy20), (tx20, ty20 + 10), (200, 60, 240), 1, cv2.LINE_AA)
+        cv2.circle(frame, (cx20, cy20), 4, (240, 80, 255), 1, cv2.LINE_AA)
+        cv2.rectangle(frame, (tx20, ty20 - 10), (tx20 + 135, ty20 + 16), (10, 8, 16), -1)
+        cv2.rectangle(frame, (tx20, ty20 - 10), (tx20 + 135, ty20 + 16), (200, 60, 240), 1, cv2.LINE_AA)
+        cv2.putText(frame, "NODE_20 [PINKY]", (tx20 + 6, ty20 + 1), FONT, 0.28, (240, 80, 255), 1, cv2.LINE_AA)
+        cv2.putText(frame, f"X:{lm20.x:.2f} Y:{lm20.y:.2f} Z:{lm20.z:.2f}", (tx20 + 6, ty20 + 11), FONT, 0.26, (200, 200, 200), 1, cv2.LINE_AA)
+
 
 # ─────────────────────────────────────────────────────────────
 # Mini Hand Icons  (drawn with OpenCV — no emoji needed)

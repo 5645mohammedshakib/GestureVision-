@@ -457,6 +457,11 @@ def main():
             hacker_mode = not hacker_mode
             _speak_async("Hacker Mode toggled" if hacker_mode else "Normal Mode restored")
         elif key == ord('t') or key == ord('T'):
+            if aria.tutorial_active:
+                aria.stop_tutorial()
+            else:
+                aria.start_tutorial()
+        elif key == ord('v') or key == ord('V'):
             thermal_mode = not thermal_mode
             _speak_async("Thermal scanner active" if thermal_mode else "Thermal deactivated")
         elif key == ord('n') or key == ord('N'):
