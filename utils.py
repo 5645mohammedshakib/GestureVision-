@@ -697,7 +697,7 @@ def show_loading_screen(window_name, duration=2.5):
             pass
             
     # Load bhanja image
-    bhanja_path = "bhanja.jpg"
+    bhanja_path = "p.jpg"
     bhanja_img = None
     if os.path.exists(bhanja_path):
         try:
@@ -900,7 +900,7 @@ def show_loading_screen(window_name, duration=2.5):
         else:
             cv2.rectangle(c, (nx1, ny1), (nx2, ny2), (30, 25, 40), -1)
             cv2.putText(c, "AWAITING PHOTO", (nx1 + 35, ny1 + 120), FONT, 0.45, (100, 100, 100), 1, cv2.LINE_AA)
-            cv2.putText(c, "(Save bhanja.jpg)", (nx1 + 35, ny1 + 140), FONT, 0.35, (80, 80, 80), 1, cv2.LINE_AA)
+            cv2.putText(c, "(Save p.jpg)", (nx1 + 35, ny1 + 140), FONT, 0.35, (80, 80, 80), 1, cv2.LINE_AA)
             
         cv2.rectangle(c, (nx1, ny1), (nx2, ny2), (200, 195, 205), 1, cv2.LINE_AA)
         for pt_x, pt_y in [(nx1, ny1), (nx2, ny1), (nx1, ny2), (nx2, ny2)]:
