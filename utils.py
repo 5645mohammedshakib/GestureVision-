@@ -695,6 +695,15 @@ def show_loading_screen(window_name, duration=2.5):
             face_img = cv2.imread(face_path)
         except Exception:
             pass
+            
+    # Load bhanja image
+    bhanja_path = "bhanja.jpg"
+    bhanja_img = None
+    if os.path.exists(bhanja_path):
+        try:
+            bhanja_img = cv2.imread(bhanja_path)
+        except Exception:
+            pass
 
     fw, fh = 1280, 720
     start = time.time()
@@ -831,11 +840,11 @@ def show_loading_screen(window_name, duration=2.5):
         cv2.putText(c, "[CAM_LOCK: index_0]", (35, fh - 35), FONT, 0.42, (180, 240, 160), 1, cv2.LINE_AA)
         cv2.putText(c, "[SYS_LOAD: NOMINAL]", (fw - 230, fh - 35), FONT, 0.42, (180, 180, 180), 1, cv2.LINE_AA)
 
-        # 7. Frosted Glass Panel Container (scaled perfectly for 1280x720 native HD!)
-        card_x1 = fw // 2 - 360
-        card_x2 = fw // 2 + 360
-        card_y1 = fh // 2 - 150
-        card_y2 = fh // 2 + 150
+        # 7. Frosted Glass Panel Container (Wider and Taller to fit photos and names!)
+        card_x1 = fw // 2 - 480
+        card_x2 = fw // 2 + 480
+        card_y1 = fh // 2 - 170
+        card_y2 = fh // 2 + 180
         glass_panel(c, card_x1, card_y1, card_x2, card_y2, (10, 8, 14), 0.52, (200, 195, 205), r=24)
         cv2.line(c, (card_x1 + 25, card_y1 + 1), (card_x2 - 25, card_y1 + 1), (255, 255, 255), 1, cv2.LINE_AA)
 
@@ -874,35 +883,65 @@ def show_loading_screen(window_name, duration=2.5):
         cv2.line(c, (px1, scan_face_y), (px2, scan_face_y), (0, 255, 255), 2, cv2.LINE_AA)
         
         # Owner Verification Status Text under the picture
-        cv2.putText(c, "SECURE VERIFIED: OWNER", (px1 + 15, py2 + 18), FONT, 0.36, (80, 255, 130), 1, cv2.LINE_AA)
+        msg_y = py2 + 25
+        cv2.putText(c, "MOHAMMED SHAKIB", (px1 + 10, msg_y), FONTB, 0.45, (0, 255, 255), 1, cv2.LINE_AA)
+        cv2.putText(c, "THE MASTERMIND", (px1 + 30, msg_y + 16), FONT, 0.35, (200, 195, 205), 1, cv2.LINE_AA)
+        
+        # 7.6 RIGHT HALF OF CARD - BHANJA PHOTO
+        nx1, nx2 = card_x2 - 235, card_x2 - 35
+        ny1, ny2 = card_y1 + 30, card_y1 + 270
+        
+        if bhanja_img is not None:
+            try:
+                bhanja_resized = cv2.resize(bhanja_img, (200, 240))
+                c[ny1:ny2, nx1:nx2] = bhanja_resized
+            except Exception:
+                cv2.rectangle(c, (nx1, ny1), (nx2, ny2), (30, 25, 40), -1)
+        else:
+            cv2.rectangle(c, (nx1, ny1), (nx2, ny2), (30, 25, 40), -1)
+            cv2.putText(c, "AWAITING PHOTO", (nx1 + 35, ny1 + 120), FONT, 0.45, (100, 100, 100), 1, cv2.LINE_AA)
+            cv2.putText(c, "(Save bhanja.jpg)", (nx1 + 35, ny1 + 140), FONT, 0.35, (80, 80, 80), 1, cv2.LINE_AA)
+            
+        cv2.rectangle(c, (nx1, ny1), (nx2, ny2), (200, 195, 205), 1, cv2.LINE_AA)
+        for pt_x, pt_y in [(nx1, ny1), (nx2, ny1), (nx1, ny2), (nx2, ny2)]:
+            sign_x = 1 if pt_x == nx1 else -1
+            sign_y = 1 if pt_y == ny1 else -1
+            cv2.line(c, (pt_x - sign_x*3, pt_y), (pt_x + sign_x*15, pt_y), (0, 255, 255), 2, cv2.LINE_AA)
+            cv2.line(c, (pt_x, pt_y - sign_y*3), (pt_x, pt_y + sign_y*15), (0, 255, 255), 2, cv2.LINE_AA)
+            
+        cv2.line(c, (nx1, scan_face_y), (nx2, scan_face_y), (0, 255, 255), 2, cv2.LINE_AA)
+        
+        n_msg_y = ny2 + 25
+        cv2.putText(c, "MOHAMMED ARHAM", (nx1 + 10, n_msg_y), FONTB, 0.45, (0, 255, 255), 1, cv2.LINE_AA)
+        cv2.putText(c, "THE SUCCESSOR", (nx1 + 35, n_msg_y + 16), FONT, 0.35, (200, 195, 205), 1, cv2.LINE_AA)
 
-        # 8. Clean glowing Title (aligned to the right side of the card!)
+        # 8. Clean glowing Title (Centered gracefully!)
         title = "GESTUREVISION  X"
-        tx, ty = fw // 2 - 100, card_y1 + 70
+        tx, ty = fw // 2 - 200, card_y1 + 70
         
         glow_layer = np.zeros_like(c)
-        cv2.putText(glow_layer, title, (tx, ty), FONTB, 1.40, (220, 100, 240), 6, cv2.LINE_AA)
+        cv2.putText(glow_layer, title, (tx, ty), FONTB, 1.30, (220, 100, 240), 6, cv2.LINE_AA)
         glow_layer = cv2.GaussianBlur(glow_layer, (15, 15), 0)
         c = cv2.addWeighted(c, 1.0, glow_layer, 0.45, 0)
         
-        cv2.putText(c, title, (tx + 2, ty + 2), FONTB, 1.40, (10, 8, 14), 5, cv2.LINE_AA)
-        cv2.putText(c, title, (tx, ty), FONTB, 1.40, (245, 248, 255), 2, cv2.LINE_AA)
+        cv2.putText(c, title, (tx + 2, ty + 2), FONTB, 1.30, (10, 8, 14), 5, cv2.LINE_AA)
+        cv2.putText(c, title, (tx, ty), FONTB, 1.30, (245, 248, 255), 2, cv2.LINE_AA)
 
         # 9. Luxury Subtitles perfectly spaced inside the box (zero overlaps!)
-        cv2.putText(c, "GODMODE EXECUTIVE LOADER v4.5", (fw//2 - 100, card_y1 + 120), FONT, 0.45, (200, 180, 210), 1, cv2.LINE_AA)
-        cv2.putText(c, "AI WRITING | 17 GESTURES | 22 FILTERS", (fw//2 - 100, card_y1 + 160), FONT, 0.42, (255, 220, 130), 1, cv2.LINE_AA)
+        cv2.putText(c, "GODMODE EXECUTIVE LOADER v4.5", (fw//2 - 200, card_y1 + 120), FONT, 0.45, (200, 180, 210), 1, cv2.LINE_AA)
+        cv2.putText(c, "AI WRITING | 17 GESTURES | 22 FILTERS", (fw//2 - 200, card_y1 + 160), FONT, 0.42, (255, 220, 130), 1, cv2.LINE_AA)
 
-        # 10. Elegant Telemetry Status Log (placed inside the box with comfortable spacing!)
+        # 10. Elegant Telemetry Status Log
         lbl = steps[0][1]
         for thr, lb in steps:
             if p >= thr:
                 lbl = lb
         status_text = f">> STATUS: {lbl}   ({int(p * 100)}%)"
-        cv2.putText(c, status_text, (fw//2 - 100, card_y1 + 210), FONT, 0.45, (255, 240, 100), 1, cv2.LINE_AA)
+        cv2.putText(c, status_text, (fw//2 - 200, card_y1 + 210), FONT, 0.45, (255, 240, 100), 1, cv2.LINE_AA)
 
-        # 11. Continuous Gradient Progress Bar (enclosed perfectly at the bottom of the card!)
-        bx1, by1 = fw // 2 - 100, card_y1 + 242
-        bx2, by2 = card_x2 - 40, card_y1 + 254
+        # 11. Continuous Gradient Progress Bar (Centered)
+        bx1, by1 = fw // 2 - 200, card_y1 + 242
+        bx2, by2 = nx1 - 40, card_y1 + 254
         cv2.rectangle(c, (bx1, by1), (bx2, by2), (18, 14, 24), -1)
         cv2.rectangle(c, (bx1, by1), (bx2, by2), (80, 75, 85), 1, cv2.LINE_AA)
         
