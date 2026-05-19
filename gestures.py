@@ -87,8 +87,8 @@ def detect_gesture(lm, handedness="RIGHT HAND"):
     if all(fingers):
         return "open_palm"
 
-    # ── 2. Fist: all down ─────────────────────────────────────────────────
-    if not any(fingers):
+    # ── 2. Fist: all down or hand closed ──────────────────────────────────
+    if not any(fingers) or (hand_openness(lm) < 0.18 and not index and not middle):
         return "fist"
 
     # ── 3. Peace / V-sign: index + middle, rest down ─────────────────────

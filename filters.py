@@ -100,11 +100,10 @@ def apply_sepia(frame):
 def apply_cartoon(frame):
     """
     Cartoon / cel-shading effect:
-      1. Bilateral filter to flatten colours
+      1. Fast edge preserving filter to flatten colours
       2. Canny edges overlaid as black outlines
     """
-    # Flatten colours (preserve edges)
-    color = cv2.bilateralFilter(frame, d=9, sigmaColor=200, sigmaSpace=200)
+    color = cv2.edgePreservingFilter(frame, flags=1, sigma_s=10, sigma_r=0.25)
 
     # Edge mask
     gray  = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -130,7 +129,6 @@ def apply_vignette(frame):
     Vintage effect:
       • Warm tint
       • Strong pre-calculated oval vignette (dark edges) cached for speed
-      • Film-grain noise
     """
     h, w = frame.shape[:2]
     key = (h, w)
@@ -149,8 +147,6 @@ def apply_vignette(frame):
     warm[:, :, 0] = np.clip(warm[:, :, 0] * 0.85, 0, 255)  # reduce blue
 
     result = (warm * vmask).astype(np.uint8)
-    noise = np.random.randint(-18, 18, frame.shape, dtype=np.int16)
-    result = np.clip(result.astype(np.int16) + noise, 0, 255).astype(np.uint8)
     return result
 
 
@@ -202,21 +198,23 @@ def apply_sketch(frame):
 # ─────────────────────────────────────────────────────────────
 # 12. Bokeh Background Blur
 # ─────────────────────────────────────────────────────────────
-def apply_background_blur(frame, blur_k=61):
+def apply_background_blur(frame, blur_k=45):
     """Simulated portrait / bokeh mode with elliptical subject mask."""
     if blur_k % 2 == 0:
         blur_k += 1
-    h, w   = frame.shape[:2]
-    blurred = cv2.GaussianBlur(frame, (blur_k, blur_k), 0)
-    mask    = np.zeros((h, w), dtype=np.uint8)
-    cv2.ellipse(mask, (w//2, h//2), (w//3, h//2 - 40), 0, 0, 360, 255, -1)
-    mask    = cv2.GaussianBlur(mask, (71, 71), 0)
-    alpha   = (mask.astype(np.float32) / 255.0)
+    h, w = frame.shape[:2]
+    # Downsample for faster blur
+    small = cv2.resize(frame, (w//2, h//2))
+    blurred_small = cv2.GaussianBlur(small, (15, 15), 0)
+    blurred = cv2.resize(blurred_small, (w, h))
     
-    out = blurred.copy()
-    for c in range(3):
-        out[:, :, c] = frame[:, :, c] * alpha + blurred[:, :, c] * (1.0 - alpha)
-    return out.astype(np.uint8)
+    mask = np.zeros((h, w, 1), dtype=np.uint8)
+    cv2.ellipse(mask, (w//2, h//2), (w//3, h//2 - 40), 0, 0, 360, 255, -1)
+    mask = cv2.GaussianBlur(mask, (51, 51), 0)
+    
+    alpha = mask.astype(np.float32) / 255.0
+    out = (frame * alpha + blurred * (1.0 - alpha)).astype(np.uint8)
+    return out
 
 
 # ─────────────────────────────────────────────────────────────
@@ -225,7 +223,7 @@ def apply_background_blur(frame, blur_k=61):
 def apply_watercolor(frame):
     """Soft painterly watercolor effect optimized via pyramidal downsampling."""
     small = cv2.pyrDown(frame)
-    small = cv2.bilateralFilter(small, 7, 50, 50)
+    small = cv2.edgePreservingFilter(small, flags=1, sigma_s=10, sigma_r=0.25)
     res = cv2.pyrUp(small)
     if res.shape != frame.shape:
         res = cv2.resize(res, (frame.shape[1], frame.shape[0]))
@@ -239,15 +237,13 @@ def apply_watercolor(frame):
 # 14. Oil Paint
 # ─────────────────────────────────────────────────────────────
 def apply_oil_paint(frame):
-    """Approximates oil painting with median+bilateral stacking."""
-    med  = cv2.medianBlur(frame, 7)
-    bil  = cv2.bilateralFilter(med, 15, 120, 120)
-    bil2 = cv2.bilateralFilter(bil,  9,  80,  80)
-    # Boost saturation
-    hsv  = cv2.cvtColor(bil2, cv2.COLOR_BGR2HSV).astype(np.float32)
-    hsv[:,:,1] = np.clip(hsv[:,:,1]*1.5, 0, 255)
-    hsv[:,:,2] = np.clip(hsv[:,:,2]*1.1, 0, 255)
-    return cv2.cvtColor(hsv.astype(np.uint8), cv2.COLOR_HSV2BGR)
+    """Approximates oil painting with fast edge preserving filter."""
+    res = cv2.edgePreservingFilter(frame, flags=1, sigma_s=15, sigma_r=0.3)
+    hsv = cv2.cvtColor(res, cv2.COLOR_BGR2HSV)
+    h, s, v = cv2.split(hsv)
+    s = cv2.multiply(s, 1.4)
+    res = cv2.merge([h, s, v])
+    return cv2.cvtColor(res, cv2.COLOR_HSV2BGR)
 
 
 # ─────────────────────────────────────────────────────────────
