@@ -259,6 +259,13 @@ class WritingCanvas:
         return cv2.add(bg,fg)
 
 
+def get_rainbow_color(offset=0.0, speed=3.0):
+    t = time.time() * speed + offset
+    r = int(127 + 127 * math.sin(t))
+    g = int(127 + 127 * math.sin(t + 2.094)) # 120 deg shift
+    b = int(127 + 127 * math.sin(t + 4.188)) # 240 deg shift
+    return (b, g, r)
+
 # ─────────────────────────────────────────────────────────────
 # Skeleton with Glow
 # ─────────────────────────────────────────────────────────────
@@ -267,15 +274,11 @@ def draw_skeleton(frame, landmarks, stability=1.0, hand_label="RIGHT HAND", show
     H,W=frame.shape[:2]
     br=int(140+stability*115)
     
-    # Dual-Hand Adaptive Palette (Left Hand = Blue/Green theme, Right Hand = Pink/Cyan theme)
+    # Dual-Hand Adaptive Palette for telemetry labels
     if "LEFT" in hand_label.upper():
-        jcol = (br, int(br*0.4), 20)           # Blue dominant joint accent
-        lcol = (int(br*0.6), int(br*0.3), 10)  # Blue joint connections
         tcol = (255, 120, 80)                  # Label text color
         box_border = (br, int(br*0.6), 40)
     else:
-        jcol = (0, br, int(br*0.65))           # Cyan/Green dominant joint accent
-        lcol = (int(br*0.3), int(br*0.6), int(br*0.4)) # Cyan/Green joint connections
         tcol = (80, 240, 255)                  # Label text color
         box_border = (0, br, int(br*0.6))
 
@@ -283,19 +286,22 @@ def draw_skeleton(frame, landmarks, stability=1.0, hand_label="RIGHT HAND", show
     for a,b in HAND_CONNECTIONS:
         p1=(int(landmarks[a].x*W),int(landmarks[a].y*H))
         p2=(int(landmarks[b].x*W),int(landmarks[b].y*H))
-        cv2.line(glow,p1,p2,jcol,10,cv2.LINE_AA)
+        col = get_rainbow_color((a + b) * 0.12, speed=3.0)
+        cv2.line(glow,p1,p2,col,10,cv2.LINE_AA)
     cv2.addWeighted(cv2.GaussianBlur(glow,(17,17),0),0.35,frame,1.0,0,frame)
 
     for a,b in HAND_CONNECTIONS:
         p1=(int(landmarks[a].x*W),int(landmarks[a].y*H))
         p2=(int(landmarks[b].x*W),int(landmarks[b].y*H))
-        cv2.line(frame,p1,p2,lcol,2,cv2.LINE_AA)
+        col = get_rainbow_color((a + b) * 0.12, speed=3.0)
+        cv2.line(frame,p1,p2,col,2,cv2.LINE_AA)
 
     for i,lm in enumerate(landmarks):
         cx,cy=int(lm.x*W),int(lm.y*H)
         r=6 if i in [4,8,12,16,20] else 3
         cv2.circle(frame,(cx,cy),r+2,(0,30,15),-1)
-        cv2.circle(frame,(cx,cy),r,jcol,-1,cv2.LINE_AA)
+        col = get_rainbow_color(i * 0.15, speed=3.0)
+        cv2.circle(frame,(cx,cy),r,col,-1,cv2.LINE_AA)
 
     # Holographic Floating Biometric Telemetry
     if show_telemetry and len(landmarks) > 20:
@@ -322,6 +328,37 @@ def draw_skeleton(frame, landmarks, stability=1.0, hand_label="RIGHT HAND", show
         cv2.rectangle(frame, (tx20, ty20 - 10), (tx20 + 135, ty20 + 16), (200, 60, 240) if hand_tag == "R" else (220, 100, 50), 1, cv2.LINE_AA)
         cv2.putText(frame, f"NODE_20 [{hand_tag}_PNK]", (tx20 + 6, ty20 + 1), FONT, 0.28, (240, 80, 255) if hand_tag == "R" else (240, 120, 80), 1, cv2.LINE_AA)
         cv2.putText(frame, f"X:{lm20.x:.2f} Y:{lm20.y:.2f} Z:{lm20.z:.2f}", (tx20 + 6, ty20 + 11), FONT, 0.26, (200, 200, 200), 1, cv2.LINE_AA)
+
+
+def draw_rainbow_border(frame, thickness=3, speed=4.0):
+    """Draws a rotating laser rainbow border around the perimeter of the frame."""
+    H, W = frame.shape[:2]
+    num_segs = 40
+    points = []
+    
+    # Top edge
+    for x in np.linspace(0, W, 11):
+        points.append((int(x), 0))
+    # Right edge
+    for y in np.linspace(0, H, 11)[1:]:
+        points.append((W, int(y)))
+    # Bottom edge
+    for x in np.linspace(W, 0, 11)[1:]:
+        points.append((int(x), H - 1))
+    # Left edge
+    for y in np.linspace(H, 0, 11)[1:]:
+        points.append((0, int(y)))
+
+    # Draw segments connecting the points
+    for i in range(len(points) - 1):
+        p1 = points[i]
+        p2 = points[i+1]
+        offset = (i / len(points)) * 6.28
+        col = get_rainbow_color(offset, speed)
+        cv2.line(frame, p1, p2, col, thickness, cv2.LINE_AA)
+        
+    col_last = get_rainbow_color(6.28, speed)
+    cv2.line(frame, points[-1], points[0], col_last, thickness, cv2.LINE_AA)
 
 
 # ─────────────────────────────────────────────────────────────

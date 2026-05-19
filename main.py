@@ -56,7 +56,7 @@ from utils import (
     FPSCounter, GestureCooldown, SessionStats,
     VideoRecorder, WritingCanvas, ParticleSystem,
     draw_hud, draw_skeleton, draw_confidence_ring,
-    draw_motion_trail, draw_speed_bar,
+    draw_motion_trail, draw_speed_bar, draw_rainbow_border,
     save_screenshot, show_loading_screen, ensure_dirs,
     glass_panel, txt, label, C_CYAN, C_GREEN, C_PINK, C_WHITE, C_DIM, C_DARK, C_RED, C_YELLOW, C_BORDER
 )
@@ -598,6 +598,9 @@ def main():
 
         # Draw ARIA Assistant panel
         aria.draw(out)
+
+        # Draw rotating laser rainbow border around the entire screen
+        draw_rainbow_border(out, thickness=4, speed=3.0)
 
         # Display output frame
         cv2.imshow(WINDOW_NAME, out)
