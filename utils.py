@@ -11,7 +11,7 @@ from collections import deque
 SCREENSHOT_DIR = "screenshots"
 VIDEO_DIR      = "recordings"
 FONT  = cv2.FONT_HERSHEY_SIMPLEX
-FONTB = cv2.FONT_HERSHEY_DUPLEX
+FONTB = cv2.FONT_HERSHEY_SIMPLEX
 
 # Neon Cyberpunk Palette (BGR)
 C_CYAN   = (220, 210, 0)

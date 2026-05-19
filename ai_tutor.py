@@ -19,7 +19,7 @@ import random
 from collections import deque
 
 FONT  = cv2.FONT_HERSHEY_SIMPLEX
-FONTB = cv2.FONT_HERSHEY_DUPLEX
+FONTB = cv2.FONT_HERSHEY_SIMPLEX
 
 # Voice disabled — _speak_async is a no-op
 _TTS_OK = False
