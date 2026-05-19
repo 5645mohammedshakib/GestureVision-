@@ -1,6 +1,6 @@
 """
 main.py - GestureVision X GODMODE [v4.0 LEGENDARY OS EDITION]
---------------------------------------------------------------
+-------------------------------------------------------------
 A next-generation AI-powered computer control, advanced computer vision,
 and surveillance operating system inspired by JARVIS, Cyberpunk 2077, and holographic HUDs.
 """

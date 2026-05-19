@@ -1,6 +1,6 @@
 """
-utils.py - GestureVision AI [v4.5 LEGENDARY HUD]
-----------------------------------------------
+utils.py - GestureVision X AI [v4.5 LEGENDARY HUD]
+--------------------------------------------------
 Glassmorphism panels, sharp text, no cut-offs, stable layout.
 """
 
@@ -165,7 +165,7 @@ def save_screenshot(frame, stats=None):
     ts=datetime.now().strftime("%Y%m%d_%H%M%S")
     path=os.path.join(SCREENSHOT_DIR,f"shot_{ts}.png")
     cv2.imwrite(path,frame)
-    print(f"[GestureVision] Screenshot -> {path}")
+    print(f"[GestureVision X] Screenshot -> {path}")
     if stats: stats.log_screenshot()
     return path
 
@@ -713,7 +713,7 @@ def show_loading_screen(window_name, duration=2.5):
         (0.25, "SECURING BIOMETRIC HAND-SHAKE..."),
         (0.50, "INITIALIZING CAMERA CAPTURE..."),
         (0.75, "TUNING SPECTRUM PIXELS..."),
-        (0.92, "READY! GESTUREVISION ONLINE")
+        (0.92, "READY! GESTUREVISION X ONLINE")
     ]
     
     # Pre-generate elegant floating neon starfield coordinates
@@ -917,7 +917,7 @@ def show_loading_screen(window_name, duration=2.5):
         cv2.putText(c, "THE SUCCESSOR", (nx1 + 35, n_msg_y + 16), FONT, 0.35, (200, 195, 205), 1, cv2.LINE_AA)
 
         # 8. Clean glowing Title (Centered gracefully!)
-        title = "GESTUREVISION  X"
+        title = "GESTUREVISION X"
         tx, ty = fw // 2 - 200, card_y1 + 70
         
         glow_layer = np.zeros_like(c)
