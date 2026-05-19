@@ -282,26 +282,19 @@ def draw_skeleton(frame, landmarks, stability=1.0, hand_label="RIGHT HAND", show
         tcol = (80, 240, 255)                  # Label text color
         box_border = (0, br, int(br*0.6))
 
-    glow=np.zeros_like(frame)
     for a,b in HAND_CONNECTIONS:
         p1=(int(landmarks[a].x*W),int(landmarks[a].y*H))
         p2=(int(landmarks[b].x*W),int(landmarks[b].y*H))
         col = get_rainbow_color((a + b) * 0.12, speed=3.0)
-        cv2.line(glow,p1,p2,col,10,cv2.LINE_AA)
-    cv2.addWeighted(cv2.GaussianBlur(glow,(17,17),0),0.35,frame,1.0,0,frame)
-
-    for a,b in HAND_CONNECTIONS:
-        p1=(int(landmarks[a].x*W),int(landmarks[a].y*H))
-        p2=(int(landmarks[b].x*W),int(landmarks[b].y*H))
-        col = get_rainbow_color((a + b) * 0.12, speed=3.0)
-        cv2.line(frame,p1,p2,col,2,cv2.LINE_AA)
+        cv2.line(frame,p1,p2,col,5,cv2.LINE_AA)
+        cv2.line(frame,p1,p2,(255,255,255),1,cv2.LINE_AA)
 
     for i,lm in enumerate(landmarks):
         cx,cy=int(lm.x*W),int(lm.y*H)
         r=6 if i in [4,8,12,16,20] else 3
-        cv2.circle(frame,(cx,cy),r+2,(0,30,15),-1)
         col = get_rainbow_color(i * 0.15, speed=3.0)
-        cv2.circle(frame,(cx,cy),r,col,-1,cv2.LINE_AA)
+        cv2.circle(frame,(cx,cy),r+2,col,-1,cv2.LINE_AA)
+        cv2.circle(frame,(cx,cy),r,(255,255,255),-1,cv2.LINE_AA)
 
     # Holographic Floating Biometric Telemetry
     if show_telemetry and len(landmarks) > 20:

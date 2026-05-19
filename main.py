@@ -190,7 +190,7 @@ def main():
     ensure_dirs()
     cv2.namedWindow(WINDOW_NAME, cv2.WINDOW_NORMAL)
     cv2.resizeWindow(WINDOW_NAME, FRAME_W, FRAME_H)
-    show_loading_screen(WINDOW_NAME, duration=2.2)
+    show_loading_screen(WINDOW_NAME, duration=0.2)
 
     print("[SYS] Building landmarker...")
     landmarker  = build_landmarker()
@@ -598,9 +598,6 @@ def main():
 
         # Draw ARIA Assistant panel
         aria.draw(out)
-
-        # Draw rotating laser rainbow border around the entire screen
-        draw_rainbow_border(out, thickness=4, speed=3.0)
 
         # Display output frame
         cv2.imshow(WINDOW_NAME, out)
