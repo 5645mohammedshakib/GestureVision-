@@ -25,6 +25,17 @@ A next-generation AI-powered computer control, advanced computer vision, and sur
 
 ---
 
+## 👑 Project Creator & Mastermind
+
+<div align="center">
+  <img src="user_face.jpg" alt="Creator Photo" width="250" style="border-radius: 20px; border: 3px solid #00FFFF; box-shadow: 0 0 20px #00FFFF;" />
+  <br/>
+  <h3><strong>MOHAMMED SHAKIB</strong></h3>
+  <p><i>The Visionary Behind GestureVisionX GODMODE</i></p>
+</div>
+
+---
+
 ## 🛠️ Technology Stack
 - **Python 3.14+**
 - **OpenCV:** High-performance computer vision and rendering.
