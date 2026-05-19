@@ -31,7 +31,7 @@ A next-generation AI-powered computer control, advanced computer vision, and sur
   <img src="user_face.jpg" alt="Creator Photo" width="250" style="border-radius: 20px; border: 3px solid #00FFFF; box-shadow: 0 0 20px #00FFFF;" />
   <br/>
   <h3><strong>MOHAMMED SHAKIB</strong></h3>
-  <p><i>The Visionary Behind GestureVision X GODMODE</i></p>
+  <p><i>The Visionary Behind GestureVision_X</i></p>
 </div>
 
 ---
